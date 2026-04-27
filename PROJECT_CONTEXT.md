@@ -13,7 +13,7 @@ Before modifying or running this project, read this file and the local private c
 Run from the project root:
 
 ```bash
-node scripts/run-codabench-sync.cjs
+./scripts/run-sync.sh
 ```
 
 ## Files
@@ -21,6 +21,7 @@ node scripts/run-codabench-sync.cjs
 - `config.example.json`: safe public template.
 - `config.local.json`: private local config with the real competition URL, Google Sheet URL/tab, ignore list, affiliation map, and paths. This file is ignored by Git.
 - `scripts/run-codabench-sync.cjs`: full manual workflow.
+- `scripts/run-sync.sh`: preferred Codex/local entrypoint; finds Node.js and Playwright without requiring `npm` on PATH.
 - `scripts/download-codabench-participants.cjs`: downloads Codabench CSV into `data/participants.csv`.
 - `scripts/append-google-sheet-participants.cjs`: merges CSV into Google Sheet.
 - `scripts/project-config.cjs`: shared config/path helper.

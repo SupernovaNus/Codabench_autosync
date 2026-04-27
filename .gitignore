@@ -1,5 +1,7 @@
 .DS_Store
+.codex/
 .profiles/
+node_modules/
 logs/*
 !logs/.gitkeep
 data/*

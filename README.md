@@ -7,7 +7,7 @@ This project downloads a participant CSV from Codabench and merges missing parti
 From the project root:
 
 ```bash
-node scripts/run-codabench-sync.cjs
+./scripts/run-sync.sh
 ```
 
 The runner performs three steps:
@@ -36,13 +36,13 @@ PROJECT_CONTEXT.md   Short Codex handoff context
 
 ## Configuration
 
-Install dependencies first:
+For a normal local terminal, install dependencies first:
 
 ```bash
 npm install
 ```
 
-If you are running inside a Codex environment that already provides Playwright, you can skip install and set `PLAYWRIGHT_NODE_MODULES` to that environment's `node_modules` path.
+Inside Codex, `npm` may not be on the shell PATH. Use `./scripts/run-sync.sh`; it finds the Codex-provided `node` and Playwright runtime automatically when local `node_modules/` is not present.
 
 Create a private local config before running:
 
