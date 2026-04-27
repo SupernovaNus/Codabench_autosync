@@ -1,0 +1,11 @@
+.DS_Store
+.profiles/
+logs/*
+!logs/.gitkeep
+data/*
+!data/.gitkeep
+config.json
+config.local.json
+config_url_set.json
+config_default.json
+*.local.json

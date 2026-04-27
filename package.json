@@ -1,0 +1,13 @@
+{
+  "name": "codabench-participant-sync",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "sync": "node scripts/run-codabench-sync.cjs",
+    "check:repo": "node scripts/check-repo-safety.cjs"
+  },
+  "dependencies": {
+    "playwright": "^1.52.0"
+  }
+}

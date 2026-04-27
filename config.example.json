@@ -1,0 +1,23 @@
+{
+  "paths": {
+    "dataDir": "data",
+    "logsDir": "logs",
+    "participantsCsv": "data/participants.csv",
+    "profilesDir": ".profiles",
+    "codabenchProfileDir": ".profiles/codabench-chrome-profile",
+    "googleSheetProfileDir": ".profiles/google-sheet-chrome-profile"
+  },
+  "codabench": {
+    "competitionUrl": "https://www.codabench.org/competitions/YOUR_COMPETITION_ID"
+  },
+  "googleSheet": {
+    "url": "YOUR_GOOGLE_SHEET_EDIT_URL",
+    "tabName": "Participant list",
+    "statusForNewRows": "Review Required"
+  },
+  "ignoreUsernames": [],
+  "affiliationsByDomain": {
+    "example.edu": "Example University",
+    "example.org": "Example Organization"
+  }
+}
