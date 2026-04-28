@@ -42,8 +42,21 @@ const IGNORED_USERNAMES = new Set(
   (config.ignoreUsernames || []).map(normalizeUsername),
 );
 
+function emailDomain(email) {
+  const emailValue = cleanEmail(email).toLowerCase();
+  const atIndex = emailValue.lastIndexOf("@");
+  if (atIndex === -1 || atIndex === emailValue.length - 1) {
+    return "";
+  }
+  return emailValue.slice(atIndex + 1);
+}
+
+function hasReviewedAffiliation(domain) {
+  return Object.prototype.hasOwnProperty.call(AFFILIATIONS_BY_DOMAIN, domain);
+}
+
 function affiliationForEmail(email) {
-  const domain = cleanEmail(email).split("@").pop().toLowerCase();
+  const domain = emailDomain(email);
   return AFFILIATIONS_BY_DOMAIN[domain] || "N/A";
 }
 
@@ -160,6 +173,58 @@ function tsvCell(value) {
     .replace(/\t/g, " ");
 }
 
+function requireReviewedAffiliations(participantsToAppend, blankAffiliationRows) {
+  const unreviewedByDomain = new Map();
+
+  function record(domain, details) {
+    if (!domain || hasReviewedAffiliation(domain)) {
+      return;
+    }
+    const existing = unreviewedByDomain.get(domain) || [];
+    existing.push(details);
+    unreviewedByDomain.set(domain, existing);
+  }
+
+  for (const participant of participantsToAppend) {
+    const email = cleanEmail(participant.Email);
+    record(emailDomain(email), {
+      action: "append",
+      username: String(participant.Username || "").trim(),
+      email,
+    });
+  }
+
+  for (const row of blankAffiliationRows) {
+    const email = cleanEmail(row["Participant email"]);
+    record(emailDomain(email), {
+      action: "fill blank affiliation",
+      username: String(row["Participant username"] || "").trim(),
+      email,
+    });
+  }
+
+  if (unreviewedByDomain.size === 0) {
+    return;
+  }
+
+  const lines = [
+    `Unreviewed affiliation domains: ${unreviewedByDomain.size}`,
+    "Review these domains with the participant email address before updating the Sheet.",
+    "Add each domain to config.local.json under affiliationsByDomain.",
+    'Use "N/A" only after confirming the email domain is personal, unrelated, or still uncertain after brief research.',
+  ];
+
+  for (const [domain, details] of unreviewedByDomain.entries()) {
+    const examples = details
+      .slice(0, 3)
+      .map((item) => `${item.action}: ${item.username || "(blank username)"} <${item.email || "blank email"}>`)
+      .join("; ");
+    lines.push(`- ${domain}: ${examples}`);
+  }
+
+  throw new Error(lines.join("\n"));
+}
+
 function makeUpdatePlan(localParticipants, existingRows, sheetHeaders) {
   const usernameColumn = requireColumn(sheetHeaders, "Participant username");
   const emailColumn = requireColumn(sheetHeaders, "Participant email");
@@ -174,11 +239,20 @@ function makeUpdatePlan(localParticipants, existingRows, sheetHeaders) {
     }
   }
 
-  const rowsToAppend = localParticipants
-    .filter((participant) => {
-      const username = normalizeUsername(participant.Username);
-      return username && !IGNORED_USERNAMES.has(username) && !existing.has(username);
-    })
+  const participantsToAppend = localParticipants.filter((participant) => {
+    const username = normalizeUsername(participant.Username);
+    return username && !IGNORED_USERNAMES.has(username) && !existing.has(username);
+  });
+
+  const blankAffiliationRows = existingRows.filter((row) => {
+    const username = normalizeUsername(row["Participant username"]);
+    const affiliation = String(row["Affiliation Institute/Company"] || "").trim();
+    return username && !affiliation;
+  });
+
+  requireReviewedAffiliations(participantsToAppend, blankAffiliationRows);
+
+  const rowsToAppend = participantsToAppend
     .map((participant) => {
       const username = String(participant.Username || "").trim();
       const email = cleanEmail(participant.Email);
@@ -190,12 +264,7 @@ function makeUpdatePlan(localParticipants, existingRows, sheetHeaders) {
       return row;
     });
 
-  const affiliationUpdates = existingRows
-    .filter((row) => {
-      const username = normalizeUsername(row["Participant username"]);
-      const affiliation = String(row["Affiliation Institute/Company"] || "").trim();
-      return username && !affiliation;
-    })
+  const affiliationUpdates = blankAffiliationRows
     .map((row) => ({
       rowNumber: row.__rowNumber,
       username: String(row["Participant username"] || "").trim(),

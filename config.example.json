@@ -18,6 +18,7 @@
   "ignoreUsernames": [],
   "affiliationsByDomain": {
     "example.edu": "Example University",
-    "example.org": "Example Organization"
+    "example.org": "Example Organization",
+    "gmail.com": "N/A"
   }
 }

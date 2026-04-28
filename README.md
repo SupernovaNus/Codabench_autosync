@@ -61,6 +61,7 @@ Then edit `config.local.json` for routine changes:
 Do not commit `config.local.json`; it may contain usernames, private URLs, and local workflow details.
 
 Direct script runs use the saved affiliation map only. Ask Codex to research unknown domains if you want new affiliation judgments before updating the Sheet.
+The merge step stops before editing the Sheet if a pending email domain is missing from `affiliationsByDomain`. Add a confident affiliation, or add `"domain.example": "N/A"` after deciding the email domain is personal, unrelated, or uncertain.
 
 ## Notes
 
